@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VXWTRSN44Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-VXWTRSN44Y');
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Triangle Splatting+</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,500,600" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="assets/css/Highlight-Clean.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="assets/css/bulma-slider.min.css">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/logo.png">
+    <link rel="manifest" href="site.webmanifest">
+
+    <meta property="og:site_name" content="Triangle Splatting+: Differentiable Rendering with Opaque Triangles" />
+    <meta property="og:type" content="video.other" />
+    <meta property="og:title" content="Triangle Splatting+: Differentiable Rendering with Opaque Triangles" />
+    <meta property="og:description" content="Triangle Splatting+: Differentiable Rendering with Opaque Triangles, 2025." />
+
+    <script src="assets/js/video_comparison.js"></script>
+    <script type="module" src="https://unpkg.com/@google/model-viewer@2.0.1/dist/model-viewer.min.js"></script>
+    <script src="assets/js/bulma-carousel.min.js"></script>
+    <script src="assets/js/bulma-slider.min.js"></script>
+
+    <style>
+        /* 1. Fluid aspect-ratio “before/after” container */
+        .small-bal-container {
+            width: 100%;
+            max-width: 560px;
+            aspect-ratio: 560 / 322;
+            position: relative;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .small-bal-container img,
+        .small-bal-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 2. Custom carousel arrow tweaks */
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: black;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid white;
+        }
+        .carousel-control-prev-icon::after,
+        .carousel-control-next-icon::after {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border: solid white;
+        }
+        .carousel-control-prev-icon::after {
+            border-width: 0 4px 4px 0;
+            transform: rotate(135deg);
+            margin-left: -3px;
+        }
+        .carousel-control-next-icon::after {
+            border-width: 0 4px 4px 0;
+            transform: rotate(-45deg);
+            margin-right: -3px;
+        }
+
+        /* 3. Minor tweaks on very small screens */
+        @media (max-width: 575.98px) {
+            body {
+                font-size: 0.9rem;
+            }
+            h1 {
+                font-size: 1.75rem;
+            }
+            .author-container h6 {
+                font-size: 0.85rem;
+            }
+            .container,
+            .container-fluid {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="highlight-clean pb-3">
+        <div class="container-fluid mb-3">
+            <h1 class="text-center mb-2">Triangle Splatting+: Differentiable Rendering with Opaque Triangles</h1>
+        </div>
+
+        <!-- Centered author section -->
+        <div class="container author-container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-auto mb-2 text-center">
+                    <h6>
+                        <a href="https://scholar.google.com/citations?user=Z0nJ5LwAAAAJ&hl=en">
+                            Jan Held<sup>1,2</sup>
+                        </a>
+                    </h6>
+                </div>
+                <div class="col-auto mb-2 text-center">
+                    <h6>
+                        <a href="https://scholar.google.com/citations?user=kpDRpBwAAAAJ&hl=en">
+                            Renaud Vandeghen<sup>1</sup>
+                        </a>
+                    </h6>
+                </div>
+                <div class="col-auto mb-2 text-center">
+                    <h6>
+                        <a href="https://sanghyun.phd.sh/">
+                            Sanghyun Son<sup>3</sup>
+                        </a>
+                    </h6>
+                </div>
+                <div class="col-auto mb-2 text-center">
+                    <h6>
+                        <a href="http://drebain.com/">
+                            Daniel Rebain<sup>4</sup>
+                        </a>
+                    </h6>
+                </div>
+            </div>
+
+            <!-- new row for the remaining authors -->
+            <div class="row justify-content-center mt-2">
+                <div class="col-auto mb-2 text-center">
+                    <h6>
+                        <a href="https://research.adobe.com/person/matheus-gadelha/">
+                            Matheus Gadelha<sup>6</sup>
+                        </a>
+                    </h6>
+                </div>
+                <div class="col-auto mb-2 text-center">
+                    <h6>
+                        <a href="https://research.adobe.com/person/yi-zhou/">
+                            Yi Zhou<sup>6</sup>
+                        </a>
+                    </h6>
+                </div>
+                <div class="col-auto mb-2 text-center">
+                    <h6>
+                        <a href="https://scholar.google.com/citations?user=ugFNit4AAAAJ&hl=en">
+                            Ming C. Lin<sup>3</sup>
+                        </a>
+                    </h6>
+                </div>
+                <div class="col-auto mb-2 text-center">
+                    <h6>
+                        <a href="https://scholar.google.com/citations?user=IQm8ljgAAAAJ&hl=en">
+                            Marc Van Droogenbroeck<sup>1</sup>
+                        </a>
+                    </h6>
+                </div>
+                <div class="col-auto mb-2 text-center">
+                    <h6>
+                        <a href="https://theialab.ca/">
+                            Andrea Tagliasacchi<sup>2,5</sup>
+                        </a>
+                    </h6>
+                </div>
+            </div>
+        </div>
+
+
+            <div class="row justify-content-center mt-2">
+                <div class="col-auto text-center">
+                    <h6><sup>1</sup>University of Liège</h6>
+                </div>
+                <div class="col-auto text-center">
+                    <h6><sup>2</sup>Simon Fraser University</h6>
+                </div>
+                <div class="col-auto text-center">
+                    <h6><sup>3</sup>University of Maryland</h6>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mt-2">
+                <div class="col-auto text-center">
+                    <h6><sup>4</sup>University of British Columbia</h6>
+                </div>
+                <div class="col-auto text-center">
+                    <h6><sup>5</sup>University of Toronto</h6>
+                </div>
+                <div class="col-auto text-center">
+                    <h6><sup>6</sup>Adobe Research</h6>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- End author section -->
+    </div>
+
+    <div class="container align-items-center">
+        <div class="row text-center justify-content-center">
+            <div class="col-6 col-sm-3 mb-3">
+                <a href="https://arxiv.org/abs/2509.25122" target="_blank" class="link-block w-inline-block">
+                    <img src="assets/media/arxiv_paper.png" alt="paper" class="img-fluid" style="height:60px" />
+                </a>
+                <br>
+                <div class="text-block-2"><strong class="bold-text-nerf_v2">Arxiv</strong></div>
+            </div>
+            <div class="col-6 col-sm-3 mb-3">
+                <a href="https://github.com/trianglesplatting2/triangle-splatting2" target="_blank" class="link-block w-inline-block">
+                    <img src="assets/media/github.png" alt="github" class="img-fluid" style="height:60px" />
+                </a>
+                <br>
+                <div class="text-block-2"><strong class="bold-text-nerf_v2">Code</strong></div>
+            </div>
+        </div>
+    </div>
+    <p class="text-center pt-2 mx-auto" style="max-width: 1100px;">
+        Code will be released the 8th of October.
+    </p>
+
+
+        <hr class="divider" />
+
+            <div class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 text-center">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <video class="embed-responsive-item" autoplay muted loop playsinline>
+                        <source src="assets/video/teaser_video.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="font-weight-bold">Abstract</h2>
+                    <p class="text-justify">
+
+                        Reconstructing complex 3D scenes and synthesizing novel views has seen rapid progress in recent years. Neural Radiance Fields demonstrated that continuous volumetric radiance fields can achieve high-quality image synthesis, but their long training and rendering times limit practicality. 3D Gaussian Splatting (3DGS) addressed these issues by representing scenes with millions of Gaussians, enabling real-time rendering and fast optimization.  
+                        However, Gaussian primitives are not natively compatible with the mesh-based pipelines used in VR headsets, game engines, and real-time graphics applications. Existing solutions attempt to convert Gaussians into meshes through post-processing or two-stage pipelines, which increases complexity and often degrades visual quality.  <br>
+                        In this work, we introduce <strong>Triangle Splatting+</strong>, which directly optimizes triangles, the fundamental primitive of computer graphics, within a differentiable splatting framework. We reformulate triangle parametrization to enable connectivity through shared vertices, and we design a training strategy that enforces opaque triangles. The final output is immediately usable in standard graphics engines without post-processing and high-visual quality.
+                        Experiments on the Mip-NeRF360 and Tanks & Temples datasets show that Triangle Splatting+ achieves state-of-the-art performance in mesh-based novel view synthesis. Our method surpasses prior splatting approaches in visual fidelity while remaining efficient and fast to training. Moreover, the resulting semi-connected meshes support downstream applications such as physics-based simulation or interactive walkthroughs.  
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container my-4">
+        <hr class="divider" />
+        <div class="row">
+            <!-- Example 2 -->
+            <div class="col-12 col-md-6 mb-4">
+                <h5 class="text-center">Opaque Triangle Splatting vs <strong>Triangle Splatting+</strong></h5>
+                <div id="example2" class="small-bal-container">
+                    <div class="bal-wrapper">
+                        <div class="bal-after">
+                            <img src="assets/comparisons/stump_ts+.png" alt="Example 2 After">
+                            <div class="bal-afterPosition afterLabel">Triangle Splatting+ (Ours)</div>
+                        </div>
+                        <div class="bal-before">
+                            <div class="bal-before-inset">
+                                <img src="assets/comparisons/stump_ts.png" alt="Example 2 Before">
+                                <div class="bal-beforePosition beforeLabel">Opaque Triangle Splatting</div>
+                            </div>
+                        </div>
+                        <div class="bal-handle">
+                            <span class="handle-left-arrow"></span>
+                            <span class="handle-right-arrow"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Example 3 -->
+            <div class="col-12 col-md-6 mb-4">
+                <h5 class="text-center">Ground truth vs <strong>Opaque Triangle Splatting+</strong></h5>
+                <div id="example3" class="small-bal-container">
+                    <div class="bal-wrapper">
+                        <div class="bal-after">
+                            <img src="assets/comparisons/garden_ts+.png" alt="Example 3 After">
+                            <div class="bal-afterPosition afterLabel">Triangle Splatting+ (Ours)</div>
+                        </div>
+                        <div class="bal-before">
+                            <div class="bal-before-inset">
+                                <img src="assets/comparisons/garden_gt.png" alt="Example 3 Before">
+                                <div class="bal-beforePosition beforeLabel">Ground truth</div>
+                            </div>
+                        </div>
+                        <div class="bal-handle">
+                            <span class="handle-left-arrow"></span>
+                            <span class="handle-right-arrow"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Example 6 -->
+            <div class="col-12 col-md-6 mb-4">
+                <div id="example6" class="small-bal-container">
+                    <div class="bal-wrapper">
+                        <div class="bal-after">
+                            <img src="assets/comparisons/bonsai_ts+.png" alt="Example 6 After">
+                            <div class="bal-afterPosition afterLabel">Triangle Splatting+ (Ours)</div>
+                        </div>
+                        <div class="bal-before">
+                            <div class="bal-before-inset">
+                                <img src="assets/comparisons/bonsai_ts.png" alt="Example 6 Before">
+                                <div class="bal-beforePosition beforeLabel">Opaque Triangle Splatting</div>
+                            </div>
+                        </div>
+                        <div class="bal-handle">
+                            <span class="handle-left-arrow"></span>
+                            <span class="handle-right-arrow"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Example 7 -->
+            <div class="col-12 col-md-6 mb-4">
+                <div id="example7" class="small-bal-container">
+                    <div class="bal-wrapper">
+                        <div class="bal-after">
+                            <img src="assets/comparisons/room_ts+.png" alt="Example 7 After">
+                            <div class="bal-afterPosition afterLabel">Triangle Splatting+ (Ours)</div>
+                        </div>
+                        <div class="bal-before">
+                            <div class="bal-before-inset">
+                                <img src="assets/comparisons/room_gt.png" alt="Example 7 Before">
+                                <div class="bal-beforePosition beforeLabel">Ground truth</div>
+                            </div>
+                        </div>
+                        <div class="bal-handle">
+                            <span class="handle-left-arrow"></span>
+                            <span class="handle-right-arrow"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Example 4 -->
+            <div class="col-12 col-md-6 mb-4">
+                <div id="example4" class="small-bal-container">
+                    <div class="bal-wrapper">
+                        <div class="bal-after">
+                            <img src="assets/comparisons/bicycle_ts+.png" alt="Example 4 After">
+                            <div class="bal-afterPosition afterLabel">Triangle Splatting+ (Ours)</div>
+                        </div>
+                        <div class="bal-before">
+                            <div class="bal-before-inset">
+                                <img src="assets/comparisons/bicycle_ts.png" alt="Example 4 Before">
+                                <div class="bal-beforePosition beforeLabel">Opaque Triangle Splatting</div>
+                            </div>
+                        </div>
+                        <div class="bal-handle">
+                            <span class="handle-left-arrow"></span>
+                            <span class="handle-right-arrow"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Example 5 -->
+            <div class="col-12 col-md-6 mb-4">
+                <div id="example5" class="small-bal-container">
+                    <div class="bal-wrapper">
+                        <div class="bal-after">
+                            <img src="assets/comparisons/bicycle_2_ts+.png" alt="Example 5 After">
+                            <div class="bal-afterPosition afterLabel">Triangle Splatting+ (Ours)</div>
+                        </div>
+                        <div class="bal-before">
+                            <div class="bal-before-inset">
+                                <img src="assets/comparisons/bicycle_2_gt.png" alt="Example 5 Before">
+                                <div class="bal-beforePosition beforeLabel">Ground truth</div>
+                            </div>
+                        </div>
+                        <div class="bal-handle">
+                            <span class="handle-left-arrow"></span>
+                            <span class="handle-right-arrow"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center pt-3 mx-auto" style="max-width: 1100px;">
+            Triangle Splatting+ delivers high-quality novel view synthesis with fast rendering, while accurately reconstructing fine details, as demonstrated in the Bonsai scene.       
+            By relying solely on opaque triangles, the final output can be directly used in game engines and mesh-based renderers without post-processing.
+        </p>
+
+
+        <hr class="divider" />
+        <h2 class="font-weight-bold">More visual results</h2>
+            <div class="container my-4">
+        <div class="row justify-content-center">
+            <!-- First video -->
+            <div class="col-12 col-md-6 text-center">
+            <div class="embed-responsive embed-responsive-16by9">
+                <video class="embed-responsive-item" autoplay muted loop playsinline>
+                <source src="assets/video/truck.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+            </div>
+            </div>
+            <!-- Second video -->
+            <div class="col-12 col-md-6 text-center">
+            <div class="embed-responsive embed-responsive-16by9">
+                <video class="embed-responsive-item" autoplay muted loop playsinline>
+                <source src="assets/video/ignatius.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+            </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <!-- First video -->
+            <div class="col-12 col-md-6 text-center">
+            <div class="embed-responsive embed-responsive-16by9">
+                <video class="embed-responsive-item" autoplay muted loop playsinline>
+                <source src="assets/video/garden_work.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+            </div>
+            </div>
+            <!-- Second video -->
+            <div class="col-12 col-md-6 text-center">
+            <div class="embed-responsive embed-responsive-16by9">
+                <video class="embed-responsive-item" autoplay muted loop playsinline>
+                <source src="assets/video/ray_tracing.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <p class="text-center pt-3 mx-auto" style="max-width: 1100px;">
+        Triangle Splatting+ (1) enables fast training, both scenes (upper row) were optimized in under 25 minutes, (2) requires little memory, final output files are below 40 MB without any compression, and (3) still achieves high visual quality.
+        </p>
+
+
+
+            <div class="container mb-4">
+        <hr class="divider" />
+        <h2 class="font-weight-bold">Download optimized ply files (+-50MB)</h2>
+
+        <div class="row">
+        <div class="col-12 col-md-4 mb-4 text-center">
+            <img src="assets/comparisons/garden_ply.png" alt="RGB image" class="img-fluid rounded shadow-sm">
+            <p class="mt-2">Garden - 43MB - 35min training time</p>
+        </div>
+
+        <div class="col-12 col-md-4 mb-4 text-center">
+            <img src="assets/comparisons/bicycle_ply.jpg" alt="Normal map" class="img-fluid rounded shadow-sm">
+            <p class="mt-2">Bicycle - 51MB - 35min training time</p>
+        </div>
+
+        <div class="col-12 col-md-4 mb-4 text-center">
+            <img src="assets/comparisons/truck_ply.png" alt="Extra scene" class="img-fluid rounded shadow-sm">
+            <p class="mt-2">Truck - 30MB - 25min training time</p>
+        </div>
+    </div>
+
+
+        <p class="text-center pt-2 mx-auto" style="max-width: 1100px;">
+            If you want to run some scene on a game engine for yourself, you can download the <em>Garden</em>, <em>Bicycle</em> or <em>Truck</em> scenes from the following 
+            <a href="https://drive.google.com/drive/folders/1HMddW9_OMG2UCBWoJmspkoXBplf2PH5x?usp=sharing" target="_blank">link</a>.
+            To achieve the highest visual quality, you should use 4× supersampling.
+
+        </p>
+        </div>
+
+
+        <div class="container mb-4">
+        <hr class="divider" />
+        <h2 class="font-weight-bold">Download the Unity project to explore physics-based interactions and walkable scenes</h2>
+
+        <div class="row">
+            <div class="col-12 col-md-6 mb-4 text-center">
+            <img src="assets/comparisons/walkable.png" alt="RGB image" class="img-fluid rounded shadow-sm">
+            </div>
+
+            <div class="col-12 col-md-6 mb-4 text-center">
+            <img src="assets/comparisons/interaction.png" alt="Normal map" class="img-fluid rounded shadow-sm">
+            </div>
+        </div>
+
+        <p class="text-center pt-2 mx-auto" style="max-width: 1100px;">
+            If you want to try out physics interactions or explore the environment with a character, you can download the Unity project from the link below:
+            <a href="https://drive.google.com/drive/folders/1XzCqfYbsB7Ff9HI6B90AtWM-9VKTsLel?usp=sharing" target="_blank">link</a>.
+            To achieve the highest visual quality, you should use 4× supersampling.
+        </p>
+        </div>
+
+    <div class="container mb-5">
+        <hr class="divider" />
+        <h2 class="font-weight-bold">Check out related work that led to our work</h2>
+
+        <ul class="list-unstyled">
+            <li class="mb-2">
+                <strong>Triangle Splatting for Real-Time Radiance Field Rendering</strong> — 
+                <a href="https://trianglesplatting.github.io/" target="_blank">project page</a>
+            </li>
+            <li class="mb-2">
+                <strong>3D Convex Splatting: Radiance Field Rendering with 3D Smooth Convexes</strong> — 
+                <a href="https://convexsplatting.github.io/" target="_blank">project page</a>
+            </li>
+            <li class="mb-2">
+                <strong>DMesh++: An Efficient Differentiable Mesh for Complex Shapes</strong> — 
+                <a href="https://sonsang.github.io/dmesh2-project/" target="_blank">project page</a>
+            </li>
+            <li class="mb-2">
+                <strong>DMesh: A Differentiable Mesh Representation</strong> — 
+                <a href="https://sonsang.github.io/dmesh-project/" target="_blank">project page</a>
+            </li>
+            <li class="mb-2">
+                <strong>MiLo: Mesh-In-the-Loop Gaussian Splatting for Detailed and Efficient Surface Reconstruction</strong> — 
+                <a href="https://anttwo.github.io/milo/" target="_blank">project page</a>
+            </li>
+        </ul>
+    </div>
+
+
+
+    <div class="container mb-4">
+        <hr class="divider" />
+        <h2 class="font-weight-bold">Citation</h2>
+        <code>
+            @article{Held2025Triangle+,<br>
+            &nbsp;&nbsp;title = {Triangle Splatting+: Differentiable Rendering with Opaque Triangles},<br>
+            &nbsp;&nbsp;author = {Held, Jan and Vandeghen, Renaud and Son, Sanghyun and Rebain, Daniel and Gadelha, Matheus and Zhou, Yi and Lin, Ming C. and Van Droogenbroeck, Marc and Tagliasacchi, Andrea},<br>
+            &nbsp;&nbsp;journal = {arXiv},<br>
+            &nbsp;&nbsp;year = {2025},<br>
+            }
+        </code>
+    </div>
+
+    <hr class="divider" />
+    <footer class="footer">
+        <div class="container">
+            <div class="content has-text-centered">
+                <a class="icon-link" href="assets/videos/nerfies_paper.pdf">
+                    <i class="fas fa-file-pdf"></i>
+                </a>
+                <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+            <div class="columns is-centered">
+                <div class="column is-8">
+                    <div class="content">
+                        <p>
+                            This website is licensed under a <a rel="license"
+                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons
+                                Attribution-ShareAlike 4.0 International License</a>.
+                        </p>
+                        <p>
+                            We borrow the <a href="https://dreamfusion3d.github.io/">source code</a> for our
+                            website. We sincerely appreciate DreamFusion authors for their awesome
+                            templates.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.js?features=IntersectionObserver"></script>
+    <script src="assets/js/yall.js"></script>
+    <script>
+        yall({ observeChanges: true });
+    </script>
+    <script src="assets/js/scripts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://uploads-ssl.webflow.com/51e0d73d83d06baa7a00000f/js/webflow.fd002feec.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var video = document.getElementById('speed025');
+            if (video) {
+                video.playbackRate = 0.1;
+            }
+        });
+    </script>
+
+    <script>
+        new BeforeAfter({ id: '#example2' });
+        new BeforeAfter({ id: '#example3' });
+        new BeforeAfter({ id: '#example4' });
+        new BeforeAfter({ id: '#example5' });
+        new BeforeAfter({ id: '#example6' });
+        new BeforeAfter({ id: '#example7' });
+        new BeforeAfter({ id: '#example11' });
+        new BeforeAfter({ id: '#example12' });
+        new BeforeAfter({ id: '#examplenorm1' });
+        new BeforeAfter({ id: '#examplenorm2' });
+    </script>
+</body>
+
+</html>
